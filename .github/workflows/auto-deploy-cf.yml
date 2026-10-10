@@ -13,14 +13,10 @@ jobs:
   sync_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Sync upstream repository
-        run: gh repo sync ${{ github.repository }} --source huangxd-/danmu_api --branch main --force
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Checkout latest code
+      - name: Checkout upstream latest code (huangxd-/danmu_api)
         uses: actions/checkout@v4
         with:
+          repository: huangxd-/danmu_api
           ref: main
 
       - name: Setup Node.js
