@@ -1,0 +1,37 @@
+name: Auto Sync and Deploy to Cloudflare
+
+permissions:
+  contents: write
+  actions: write
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync upstream repository
+        run: gh repo sync ${{ github.repository }} --source huangxd-/danmu_api --branch main --force
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies and deploy to Cloudflare Worker
+        run: |
+          npm install
+          npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
